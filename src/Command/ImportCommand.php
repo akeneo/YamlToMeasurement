@@ -75,14 +75,15 @@ class ImportCommand extends Command
 
         $this->io->title('Measurement family migration tool');
         $this->io->text([
-            'Welcome to this migration tool made to help migrate your measurement families from your Custom measurement files ',
+            'Welcome to this migration tool made to help migrate your measurement families from your Custom measurement files.',
             'If you want to automate this process or don\'t want to use default values, add the --no-interaction flag when you call this command.'
         ]);
 
-        $this->io->warning(
-            'This tool will not merge existing measurement families with the measurement families in this file.' .
+        $this->io->warning([
+            'Important information',
+            'This tool will not merge existing measurement families with the measurement families in this file.',
             'If your file contains a measurement family with an existing code, it will replace the existing one and all its units.'
-        );
+        ]);
 
         if (!$this->io->confirm('Do you want to proceed?')) {
             return;
