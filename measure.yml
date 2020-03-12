@@ -1,6 +1,6 @@
 measures_config:
     Area:
-        standard: 12
+        standard: SQUARE_METER
         units:
             SQUARE_MILLIMETER:
                 convert: [{'mul': '0.000001'}]

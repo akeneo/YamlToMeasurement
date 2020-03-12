@@ -1,0 +1,7 @@
+measures_config:
+    custom_measurement:
+        standard: coucou
+        units:
+            standard_unit:
+                convert: [{'azeaze': '1'}]
+                symbol: standard
