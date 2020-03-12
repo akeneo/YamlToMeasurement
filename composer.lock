@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/akeneo/api-php-client.git",
-                "reference": "ee2337ac3d03c8ba981399f3f49f716b768a5091"
+                "reference": "99e9bd77e2e4381d8376cf28e6e75b332848f898"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/akeneo/api-php-client/zipball/ee2337ac3d03c8ba981399f3f49f716b768a5091",
-                "reference": "ee2337ac3d03c8ba981399f3f49f716b768a5091",
+                "url": "https://api.github.com/repos/akeneo/api-php-client/zipball/99e9bd77e2e4381d8376cf28e6e75b332848f898",
+                "reference": "99e9bd77e2e4381d8376cf28e6e75b332848f898",
                 "shasum": ""
             },
             "require": {
@@ -59,7 +59,7 @@
                 }
             ],
             "description": "Akeneo PIM client for the API",
-            "time": "2020-03-06T15:40:56+00:00"
+            "time": "2020-03-12T14:52:38+00:00"
         },
         {
             "name": "box/spout",
