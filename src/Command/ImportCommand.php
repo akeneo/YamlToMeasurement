@@ -94,6 +94,7 @@ class ImportCommand extends Command
 
             return $this->convertMeasurementFamily($measurementFamily, $measurementFamilyCode);
         }, array_keys($measurementFamilyRawData));
+
         $response = $apiClient->getMeasurementFamilyApi()->upsertList(array_values(array_filter($measurementFamilies)));
 
         $this->processResponse($response);
@@ -104,10 +105,7 @@ class ImportCommand extends Command
     private function convertMeasurementFamily($measurementFamily, $measurementFamilyCode)
     {
         $convertedMeasurementFamily = [
-            'code' => (string) $measurementFamilyCode,
-            'labels' => [
-                'en_US' => (string) $measurementFamilyCode
-            ]
+            'code' => (string) $measurementFamilyCode
         ];
 
         if (isset($measurementFamily['standard'])) {
@@ -132,10 +130,7 @@ class ImportCommand extends Command
     private function convertUnit($unit, $unitCode)
     {
         $convertedUnit = [
-            'code' => (string) $unitCode,
-            'labels' => [
-                'en_US' => (string) $unitCode
-            ]
+            'code' => (string) $unitCode
         ];
 
         $convertions = $unit['convert'][0];
