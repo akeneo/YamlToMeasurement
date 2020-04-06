@@ -79,12 +79,6 @@ class ImportCommand extends Command
             'If you want to automate this process or don\'t want to use default values, add the --no-interaction flag when you call this command.'
         ]);
 
-        $this->io->warning([
-            'Important information',
-            'This tool will not merge existing measurement families with the measurement families in this file.',
-            'If your file contains a measurement family with an existing code, it will replace the existing one and all its units.'
-        ]);
-
         if (!$this->io->confirm('Do you want to proceed?')) {
             return;
         }
@@ -100,6 +94,7 @@ class ImportCommand extends Command
 
             return $this->convertMeasurementFamily($measurementFamily, $measurementFamilyCode);
         }, array_keys($measurementFamilyRawData));
+
         $response = $apiClient->getMeasurementFamilyApi()->upsertList(array_values(array_filter($measurementFamilies)));
 
         $this->processResponse($response);
@@ -109,45 +104,53 @@ class ImportCommand extends Command
 
     private function convertMeasurementFamily($measurementFamily, $measurementFamilyCode)
     {
-        if (!isset($measurementFamily['standard'])) {
-            $this->io->warning(sprintf('No standard key provided for measurement family "%s" (madatory). This measurement family will be skipped', $measurementFamilyCode));
+        $convertedMeasurementFamily = [
+            'code' => (string) $measurementFamilyCode
+        ];
 
-            return false;
+        if (isset($measurementFamily['standard'])) {
+            $convertedMeasurementFamily['standard_unit_code'] = (string) $measurementFamily['standard'];
         }
 
-        $standardUnit = $measurementFamily['standard'];
-        $units = $measurementFamily['units'];
-        $units = array_map(function ($unitCode) use ($units) {
-            return $this->convertUnit($units[$unitCode], $unitCode);
-        }, array_keys($units));
+        if (!empty($measurementFamily['units'])) {
+            $convertedMeasurementFamily['units'] = array_reduce(
+                array_keys($measurementFamily['units']),
+                function (array $units, string $unitCode) use ($measurementFamily) {
+                    $units[$unitCode] = $this->convertUnit($measurementFamily['units'][$unitCode], $unitCode);
 
-        return [
-            'code' => (string) $measurementFamilyCode,
-            'labels' => [
-                'en_US' => (string) $measurementFamilyCode
-            ],
-            'standard_unit_code' => (string) $standardUnit,
-            'units' => $units
-        ];
+                    return $units;
+                },
+                []
+            );
+        }
+
+        return $convertedMeasurementFamily;
     }
 
     private function convertUnit($unit, $unitCode)
     {
-        $convert = array_map(function ($operator) use ($unit) {
-            return [
-                'operator' => (string) $operator,
-                'value' => (string) $unit['convert'][0][$operator]
-            ];
-        }, array_keys($unit['convert'][0]));
-
-        return [
-            'code' => (string) $unitCode,
-            'labels' => [
-                'en_US' => (string) $unitCode
-            ],
-            'convert_from_standard' => $convert,
-            'symbol' => (string) $unit['symbol']
+        $convertedUnit = [
+            'code' => (string) $unitCode
         ];
+
+        $convertions = $unit['convert'];
+        if (!empty($convertions)) {
+            $convertedUnit['convert_from_standard'] = array_map(function ($operation) {
+                $operator = array_keys($operation)[0];
+                $value = array_values($operation)[0];
+
+                return [
+                    'operator' => (string) array_keys($operation)[0],
+                    'value' => is_int($value) ? sprintf('%d', $value) : rtrim(sprintf('%.35f', $value), '.0')
+                ];
+            }, $convertions);
+        }
+
+        if (isset($unit['symbol'])) {
+            $convertedUnit['symbol'] = (string) $unit['symbol'];
+        }
+
+        return $convertedUnit;
     }
 
     private function processResponse(array $response)
