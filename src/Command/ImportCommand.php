@@ -133,21 +133,24 @@ class ImportCommand extends Command
             'code' => (string) $unitCode
         ];
 
-        $convertions = $unit['convert'][0];
+        $convertions = $unit['convert'];
         if (!empty($convertions)) {
-            $convertedUnit['convert_from_standard'] = array_map(function ($operator) use ($convertions) {
+            $convertedUnit['convert_from_standard'] = array_map(function ($operation) {
+                $operator = array_keys($operation)[0];
+                $value = array_values($operation)[0];
+
                 return [
-                    'operator' => (string) $operator,
-                    'value' => (string) $convertions[$operator]
+                    'operator' => (string) array_keys($operation)[0],
+                    'value' => is_int($value) ? sprintf('%d', $value) : rtrim(sprintf('%.35f', $value), '.0')
                 ];
-            }, array_keys($convertions));
+            }, $convertions);
         }
 
         if (isset($unit['symbol'])) {
             $convertedUnit['symbol'] = (string) $unit['symbol'];
         }
 
-        return$convertedUnit;
+        return $convertedUnit;
     }
 
     private function processResponse(array $response)
